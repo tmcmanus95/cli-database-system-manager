@@ -10,6 +10,9 @@ To run this application, type npm start once in the correct directory. The user 
 
 # Screenshot
 
+<img width="757" alt="Screenshot 2023-10-18 at 7 52 06 PM" src="https://github.com/tmcmanus95/cli-database-system-manager/assets/122508345/1a595bb2-0d14-45b3-b61e-d9ac9fa287b3">
+<img width="549" alt="Screenshot 2023-10-18 at 7 51 51 PM" src="https://github.com/tmcmanus95/cli-database-system-manager/assets/122508345/f160258c-7edb-46df-9be5-cce6cec7136e">
+
 # Video Link
 
 # License
