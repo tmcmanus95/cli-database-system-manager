@@ -13,6 +13,7 @@ const db = mysql.createConnection({
 let departments = [];
 let roles = [];
 let managerChoices = [];
+let employeeChoices = [];
 
 // Function to load departments from the database
 function loadDepartments() {
@@ -40,7 +41,22 @@ function loadRoles() {
   });
 }
 
+function loadEmployees() {
+  //Query that gets all the roles found in the database.
+  db.query("SELECT * FROM employees;", function (error, results) {
+    if (error) {
+      console.error("Error fetching employees: ", error);
+      return;
+    }
+
+    // Adds employees as an option per employee returned from query using the map method.
+    employeeChoices = results.map((employee) => employee.last_name);
+  });
+}
+
+//Function that loads the managers into the manager choices array.
 function loadManagerChoices() {
+  //Query that returns any user with the role of 1, the manager id
   return new Promise((resolve, reject) => {
     const query =
       "SELECT employee_id, last_name FROM employees WHERE role_id = '1'";
@@ -50,7 +66,7 @@ function loadManagerChoices() {
         reject(err);
         return;
       }
-
+      //Adds each returned result to the array.
       results.forEach((manager) => {
         managerChoices.push({
           name: manager.last_name,
@@ -63,7 +79,9 @@ function loadManagerChoices() {
   });
 }
 
+//Function for viewing the departments
 function viewDepartments() {
+  //Query to return all information from the department table.
   db.query("SELECT * FROM department;", function (error, results) {
     if (error) {
       console.error("Error fetching departments:", error);
@@ -77,7 +95,9 @@ function viewDepartments() {
   }, 1000);
 }
 
+//Function to view roles
 function viewRoles() {
+  //Query that returns the information from the roles table
   db.query("SELECT * FROM roles;", function (error, results) {
     if (error) {
       console.error("Error fetching roles: ", error);
@@ -250,12 +270,77 @@ function addAnEmployee() {
     });
 }
 
+function updateEmployee() {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "employee",
+        message: "Select an employee you would like to edit: ",
+        choices: employeeChoices,
+      },
+    ])
+    .then((selectedEmployee) => {
+      return inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "firstName",
+            message: "Enter employee's first name:",
+          },
+          {
+            type: "input",
+            name: "lastName",
+            message: "Enter employee's last name:",
+          },
+          {
+            type: "list",
+            name: "jobTitle",
+            message: "Select employee's job title:",
+            choices: roles,
+          },
+          {
+            type: "list",
+            name: "employeeManager",
+            message: "Who is this employee's manager?",
+            choices: managerChoices,
+          },
+        ])
+        .then((answer) => {
+          const query = `UPDATE employees 
+                       SET first_name = ?, last_name = ?, role_id = ?, manager_id = ? 
+                       WHERE last_name = ?`;
+          const values = [
+            answer.firstName,
+            answer.lastName,
+            2,
+            answer.employeeManager,
+            selectedEmployee.employee,
+          ];
+
+          return new Promise((resolve, reject) => {
+            db.query(query, values, (err, result) => {
+              if (err) {
+                console.error(err);
+                reject(err);
+              } else {
+                console.log("Employee updated successfully!");
+                resolve();
+              }
+            });
+          });
+        });
+    });
+}
+
 //Initial menu prompt
 function mainMenu() {
-  //reloads department and roles arrays.
+  //loads / updates department, roles, managers, and employee arrays.
   loadDepartments();
   loadRoles();
   loadManagerChoices();
+  loadEmployees();
+  console.log(employeeChoices);
   inquirer
     .prompt([
       {
@@ -295,6 +380,7 @@ function mainMenu() {
           addAnEmployee();
           break;
         case "Update existing employee role":
+          updateEmployee();
           break;
         case "Quit":
           process.exit();
@@ -327,8 +413,6 @@ function anotherTask() {
       }
     });
 }
-
-//loading functions called upon application start
 
 //Starts application by presenting user with main menu
 mainMenu();
