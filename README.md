@@ -15,6 +15,8 @@ To run this application, type npm start once in the correct directory. The user 
 
 # Video Link
 
+https://drive.google.com/file/d/1xd2_uUDB6d3Zoz4wnoqAgNWM7WoTOIgI/view
+
 # License
 
 MIT License

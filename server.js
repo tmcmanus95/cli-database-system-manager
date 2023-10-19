@@ -246,7 +246,7 @@ function addAnEmployee() {
       const values = [
         answer.firstName,
         answer.lastName,
-        answer.job_title,
+        8,
         answer.employeeManager,
       ];
 
